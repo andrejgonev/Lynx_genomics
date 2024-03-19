@@ -1,0 +1,1 @@
+for f in *.alignment.yaml; do mv "$f" "$(echo "$f" | sed s/Ruf/Lyn/)"; done
