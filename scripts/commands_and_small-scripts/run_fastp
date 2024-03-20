@@ -7,6 +7,6 @@ for row in $(cat barcodes/barcodes_filtered | tr ' ' ':'); do
     r2_fastq=$(echo $row | cut -d':' -f4)
     fastqid=$(echo $r1_fastq | sed 's/_1.fastq.gz$//')
     echo "sbatch scripts/sbatch_fastp_fqdir_r1fq_r2fq.sh ${fastq_dir} ${r1_fastq} ${r2_fastq}"
-    sbatch --output=logs/fastp/${fastqid}.out --error=logs/fastp/${fastqid}.err scripts/sbatch_fastp_fqdir_r1fq_r2fq.sh ${fastq_dir} ${r1_fastq} ${r2_fastq}
+    sbatch -o logs/fastp/${fastqid}.out -e logs/fastp/${fastqid}.err scripts/sbatch_fastp_fqdir_r1fq_r2fq.sh ${fastq_dir} ${r1_fastq} ${r2_fastq}
 
 done

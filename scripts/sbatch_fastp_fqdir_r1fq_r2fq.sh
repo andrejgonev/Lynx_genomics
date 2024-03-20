@@ -36,7 +36,7 @@ fi
 
 # create the fastp directory if it does not exist and give group persmissions
 mkdir -p ${fastq_dir}/fastp
-chmod g+w fastp/
+chmod g+w ${fastq_dir}/fastp/ # not permitted!
 
 # run fastp
 fastp \
