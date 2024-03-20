@@ -21,3 +21,14 @@ To run the alignments and sorting, each individual needs to have its configurati
 
 Some yaml configuration files were already done by Enrico for another study, so I used those, but changed all the paths and also the reference genomes, as we will now use the new Eurasian lynx reference genome. To generate the remaining yaml files, I prepared a table with the necessary information (input_data.txt) and used a bash script (link it) to extract information from it and output it in a separate yaml file for each sample. 
 
+I ran the script sbatch_alignment_of_sample
+
+```
+for yaml in $(ls config/alignment/); do
+
+    sampleid=$(echo $yaml | sed 's/.mLynLyn.alignment.yaml$//')
+    echo $sampleid
+    sbatch -o logs/alignment/${sampleid}.out -e logs/alignment/${sampleid}.err scripts/sbatch_alignment_of_sample_from_yaml.sh config/alignment/$yaml
+
+done
+```
