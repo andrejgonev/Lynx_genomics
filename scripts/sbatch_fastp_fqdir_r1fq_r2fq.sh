@@ -2,7 +2,7 @@
 #SBATCH -o logs/fastp/fastp-%j.out
 #SBATCH -e logs/fastp/fastp-%j.err
 #SBATCH --time=3:00:00
-#SBATCH --mem=4G
+#SBATCH --mem=16G
 #SBATCH --cpus-per-task=6
 
 module load cesga/2020 gcccore/system fastp/0.22.0
