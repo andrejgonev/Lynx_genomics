@@ -1,4 +1,4 @@
-for row in $(cat barcodes/barcodes_filtered | tr ' ' ':'); do
+for row in $(cat data/barcodes/barcodes_filtered | tr ' ' ':'); do
     
     fastq_dir=$(echo $row | cut -d':' -f2)
     r1_fastq=$(echo $row | cut -d':' -f3)

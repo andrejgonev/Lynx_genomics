@@ -1,6 +1,6 @@
 ### I put this on the terminal to call Enrico's script that runs fastp. I use each row in my filtered barcodes file as a separate command, so each read is a separate slurm job
 
-for row in $(cat barcodes/barcodes_filtered | tr ' ' ':'); do
+for row in $(cat data/barcodes/barcodes_filtered | tr ' ' ':'); do
     
     fastq_dir=$(echo $row | cut -d':' -f2)
     r1_fastq=$(echo $row | cut -d':' -f3)
