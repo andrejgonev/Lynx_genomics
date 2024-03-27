@@ -19,9 +19,11 @@ The samples will be aligned to the new Eurasian lynx reference genome (link).
 
 To run the alignments and sorting, each individual needs to have its configuration file in yaml. This file contains information such as: sample name, all associated fastq ids (here I use the preprocessed fastq files with fastp), with the corresponding r1s and r2s, the path to them, the reference genome and its path, the output directory for the bams, and the softwared used for each of the steps. (explain them)
 
-Some yaml configuration files were already done by Enrico for another study, so I used those, but changed all the paths and also the reference genomes, as we will now use the new Eurasian lynx reference genome. To generate the remaining yaml files, I prepared a table with the necessary information (input_data.txt) and used a bash script (link it) to extract information from it and output it in a separate yaml file for each sample. 
+Some yaml configuration files were already done by Enrico for another study, so I used those, but changed all the paths and also the reference genomes, as we will now use the new Eurasian lynx reference genome. To generate the remaining yaml files, I prepared a table with the necessary information ([input_data.txt](config/test/input_data.txt)) and used a bash [script](config/test/group_individual_yamls.sh) to extract information from it and output it in a separate yaml file for each sample. 
 
-I ran the script sbatch_alignment_of_sample
+Before running the alignment, I created a sequence dictionary of the reference genome, using samtools.
+
+I ran the script [sbatch_alignment_of_sample_from_yaml](scripts/sbatch_alignment_of_sample_from_yaml.sh).
 
 ```
 for yaml in $(ls config/alignment/); do
