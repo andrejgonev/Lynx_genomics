@@ -9,8 +9,6 @@ bams=$(ls ${bam_folder}/*er.bam)
 # sbatch QualiMap of specific samples I want to check out
 #bams=$(ls ${bam_folder}/*er.bam | grep -E "c_ll_ya_0140|c_ll_ya_0141|c_ll_ya_0142|c_ll_ya_0143|c_ll_ya_0145|c_ll_ya_0146|c_ll_ya_0147")
 
-#!/bin/bash
-
 for bam in $bams ; do
 
     sampleid=$(basename "$bam" | sed 's/_mLynLyn_ref.sorted.rg.merged_sorted.rmdup.indelrealigner.bam$//')
