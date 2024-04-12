@@ -1,6 +1,6 @@
 #!/bin/bash
-#SBATCH --output=/mnt/lustre/scratch/nlsas/home/csic/eye/lmf/logs/glnexus/slurm-%j.out
-#SBATCH --error=/mnt/lustre/scratch/nlsas/home/csic/eye/lmf/logs/glnexus/slurm-%j.err
+#SBATCH --output=/mnt/lustre/hsm/nlsas/notape/home/csic/ebd/jgl/agonev/logs/glnexus/slurm-%j.out
+#SBATCH --error=/mnt/lustre/hsm/nlsas/notape/home/csic/ebd/jgl/agonev/logs/glnexus/slurm-%j.err
 
 # In this script, the gVCFs obtained with DeepVariant are merged into a single VCF file using glnexus.
 
