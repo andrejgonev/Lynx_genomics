@@ -1,2 +1,5 @@
 config/test
 other/
+data/vcfs/
+data/variant_filtering/
+data/.R*
