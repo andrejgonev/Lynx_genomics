@@ -120,11 +120,37 @@ After our alignments are done and we are satisfied with their quality, we can pr
 
 ## 2.1. Variant calling
 
-For the variant calling, I used Google's [DeepVariant v1.6.0](https://github.com/google/deepvariant) deep learning caller.
+For the variant calling, I used Google's [DeepVariant v1.6.0](https://github.com/google/deepvariant) deep learning caller with their WGS model.
 
 ...
 
-For the pseudoautosomal regions, I followed [Lucia](https://github.com/luciamayorf)'s method and established a standard PAR1 region spanning 7 Mb at the beginning and end of the X chromosome. She chose this lenght based on literature on both the Iberian and Eurasian lynx: [6 Mb](https://doi.org/10.1186/s13059-016-1090-1)-[6.5Mb](https://doi.org/10.1186%2Fs12864-017-3946-5) and [10 Mb](https://doi.org/10.1111/eva.13302).
+For the pseudoautosomal regions, I followed [Lucia](https://github.com/luciamayorf/Variant_calling_and_filtering)'s method and established a standard PAR1 region spanning 7 Mb at the beginning and end of the X chromosome. She chose this length based on literature on both the Iberian and Eurasian lynx: [6 Mb](https://doi.org/10.1186/s13059-016-1090-1)-[6.5Mb](https://doi.org/10.1186%2Fs12864-017-3946-5) and [10 Mb](https://doi.org/10.1111/eva.13302).
+
+To do this, I created a bed file ("mLynLyn1.2.PAR1_sexChr.bed"), where I put the length of the PARs (7 Mb) from both ends of the chromosome (0-7000000; 117087176-124087175), using the indexed fasta file to get the chromosome size. These regions will be treated as autosomal in all my male samples when doing the calling. 
+
+I ran DeepVariant for my samples like this: 
+
+```
+# list of bams to process
+bams=$(ls /mnt/lustre/hsm/nlsas/notape/home/csic/ebd/jgl/lynx_genome/lynx_data/mLynLyn1.2_ref_bams/*er.bam | grep -vE "ca_0249|ca_0253")
+
+# reference genome directory
+ref_genome=/mnt/lustre/hsm/nlsas/notape/home/csic/ebd/jgl/reference_genomes/lynx_lynx_mLynLyn1.2/mLynLyn1.2.revcomp.scaffolds.fa
+
+# sample list directory
+sample_list=/mnt/lustre/hsm/nlsas/notape/home/csic/ebd/jgl/agonev/barcodes/samples_sex.txt
+
+# output directory
+output_dir=/mnt/lustre/hsm/nlsas/notape/home/csic/ebd/jgl/lynx_genome/lynx_data/mLynLyn1.2_ref_gvcfs/
+
+# loop through bams and submit jobs
+for bam in $bams; do
+    sample_name=$(basename ${bam} _mLynLyn_ref.sorted.rg.merged_sorted.rmdup.indelrealigner.bam)
+    echo "sample_name: ${sample_name}"
+    sbatch -o /mnt/lustre/hsm/nlsas/notape/home/csic/ebd/jgl/agonev/logs/variant_calling/deepvariant/${sample_name}.out -e /mnt/lustre/hsm/nlsas/notape/home/csic/ebd/jgl/agonev/logs/variant_calling/deepvariant/${sample_name}.err \
+    -c 32 --mem=64GB -t 06:00:00 --gres=gpu:a100:1 /mnt/lustre/hsm/nlsas/notape/home/csic/ebd/jgl/agonev/scripts/variant_calling_deepvariant.sh ${bam} ${ref_genome} ${sample_list} ${output_dir} ${sample_name}
+done
+```
 
 
 
