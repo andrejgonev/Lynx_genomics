@@ -263,10 +263,10 @@ With this step, I masked 1,047,269,226 bp, which is 43% of the total genome (2,4
 
 The first round of filtering was done in a 4-step procedure: 
 
-     - Filter 1: removing variants in repetitive/low complexity regions.
-     - Filter 2: removing non-biallic sites and indels.
-     - Filter 3: removing invariant sites (substitutions from the reference genome, AF=1).
-     - Filter 4: removing variants with a low quality score (QUAL >= 30).
+    - Filter 1: removing variants in repetitive/low complexity regions.
+    - Filter 2: removing non-biallic sites and indels.
+    - Filter 3: removing invariant sites (substitutions from the reference genome, AF=1).
+    - Filter 4: removing variants with a low quality score (QUAL >= 30).
 
 To apply these filters, I used the script [variant_filter_1to4](scripts/variant_filter_1to4.sh), which makes use of [bedtools](https://bedtools.readthedocs.io/en/latest/), [gatk](https://gatk.broadinstitute.org/hc/en-us) and [bcftools](https://samtools.github.io/bcftools/bcftools.html). 
 
@@ -282,45 +282,47 @@ mask=${ref_dir}/repeats_lowcomplexity_regions.bed
 sbatch --mem=12GB -t 03:00:00 scripts/variant_filter_1to4.sh ${ref} ${invcf} ${mask}
 ```
 
+Summary of the first round of filtering:
+
+
+| Filter                               | N of variants  | Filtered variants |
+|:------------------------------------:|:--------------:|:-----------------:|
+| 0. GLNexus merging (Qual >10)        |     10,977,787 |   0               |
+| 1. Low complexity and repeats        |     5,472,753  |   5,505,034       |
+| 2. Non-biallelic sites and INDELs    |     4,238,598  |   1,234,155       |
+| 3. Invariant sites                   |     4,237,961  |   637             |
+| 4. Quality filter (QUAL>=30)         |     3,757,500  |   480,461         |
 
 
 
+### 2.3.3. Second round of filtering
 
-[table]
-| Filter                                | Number of Variants | 
-|---------------------------------------|--------------------|
-| 0. GLNexus merging (Qual >10)         | 10,977,787         |
-| 1. Low complexity and repeats         | 5,472,753          |
-| 2. Non-biallelic sites and INDELs     | 4,238,598          |
-| 3. Invariant sites                    | 4,237,961          |
-| 4. Quality filter (QUAL>=30)          | 3,757,500          |
+The next two filters are applied on population, so to do that, I divided the VCF (filter4) into eleven population VCFs: 
 
+    - bal (Balkan Lynx)
+    - cau (Caucasian Lynx)
+    - crp (Carpathian Lynx)
+    - lva (Lynx in Latvia)
+    - nor (Lynx in Norway)
+    - pol (Lynx in NE Poland)
+    - tva (Lynx in Tuva region, Russia)
+    - mng (Lynx in Mongolia)
+    - wru (Lynx in Western Russia: Kirov and Ural regions)
+    - yak (Lynx in Yakutia, Russia)
+    - pyk (Lynx in Primorsky Krai, Russia)
 
-| Filter       | N of variants  | Filtered variants |
-|:-------------|:--------------:|:-----------------:|
-| No filter    |     10,977,787    |   0               |
-| Filter1      |     5,472,753     |   5,505,034       |
-| Filter2      |     4,238,598     |   1,234,155       |
-| Filter3      |     4,237,961     |   637             |
-| Filter4      |     3,757,500     |   480,461         |
-
-Number of SNPs after GLNexus merging (this applies a soft Qual >10 filter): 10977787
-After first filter (low complexity and repeats) : 5472753
-After second filter (non-biallelic sites and INDELs): 4238598
-After third filter (invariant sites): 4237961
-After fourth filter (QUAL>=30): 3757500
-
-
+To do this split, I used the [split_vcfs](scripts/commands_and_small-scripts/split_vcfs.sh) script.
 
 ## Depth filtering 
 
-I created a bam list like this: 
+To avoid including possible paralogs in the analysis, one can eliminate genomic regions where an excess of sequencing reads align to the reference genome. Same as [Enrico](https://github.com/Enricobazzi/Lynxtrogression_v2/blob/main/variant_filtering.md#calculate-read-depth-filters-in-10k-bp-window), I decided to use 10kbp windows, where the mean read depth was calculated for each sample's BAM file using [mosdepth v0.3.2](https://github.com/brentp/mosdepth). 
 
+I first created a list of bams like this: 
 ```
 ls path/to/bams/mLynLyn1.2_ref_bams/*er.bam | grep -vE "ca_0249|ca_0253" > path/to/folder/agonev/data/c_ll_105.bamlist 
 ```
 
-script [sbatch_mosdepth_10k_bam_outdir](scripts/sbatch_mosdepth_10k_bam_outdir.sh). I ran it like : 
+Then, I ran the script [sbatch_mosdepth_10k_bam_outdir](scripts/sbatch_mosdepth_10k_bam_outdir.sh): 
 
 ```
 inbams=($(cat data/c_ll_105.bamlist))
@@ -332,20 +334,25 @@ for bam in ${inbams[*]}; do
 done
 ```
 
+This then generates a bed file which I can use with the script [make_rdfilter_beds](data/make_rdfilter_beds.R) R script (a modified version of Enrico's [python](https://github.com/Enricobazzi/Lynxtrogression_v2/blob/main/src/variant_filtering/make_rdfilter_beds.py) script), to get the windows for populations whose sum of read depth values exceeds 1.5 times the mode of the values. These windows are then marked as "failed" for that population, and printed in a [table](). The script also outputs one bed file per population which contain the coordinates for the windows that do not pass the filter, draws plots and prints a summary:
 
-[1] "bal fail: 663"
-[1] "cau fail: 671"
-[1] "crp fail: 592"
-[1] "mng fail: 560"
-[1] "wru fail: 561"
-[1] "lva fail: 653"
-[1] "nor fail: 635"
-[1] "pol fail: 619"
-[1] "tva fail: 579"
-[1] "pyk fail: 605"
-[1] "yak fail: 626"
+```
+bal fail: 663
+cau fail: 671
+crp fail: 592
+mng fail: 560
+wru fail: 561
+lva fail: 653
+nor fail: 635
+pol fail: 619
+tva fail: 579
+pyk fail: 605
+yak fail: 626
 
-[1] "all fail: 442"
-[1] "bal fail and others pass: 0"
+all fail: 442
+bal fail and others pass: 0
+```
 
+
+## Missingness filtering
 
