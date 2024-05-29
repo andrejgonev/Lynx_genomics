@@ -287,14 +287,28 @@ sbatch --mem=12GB -t 03:00:00 scripts/variant_filter_1to4.sh ${ref} ${invcf} ${m
 
 
 [table]
-| Filter                           | Number of Variants |
-|----------------------------------|-------------------|
-| GLNexus merging (Qual >10)       | 10,977,787        |
-| Low complexity and repeats       | 5,472,753         |
-| Non-biallelic sites and INDELs   | 4,238,598         |
-| Invariant sites                  | 4,237,961         |
-| QUAL >= 30                       | 3,757,500         |
+| Filter                                | Number of Variants | 
+|---------------------------------------|--------------------|
+| 0. GLNexus merging (Qual >10)         | 10,977,787         |
+| 1. Low complexity and repeats         | 5,472,753          |
+| 2. Non-biallelic sites and INDELs     | 4,238,598          |
+| 3. Invariant sites                    | 4,237,961          |
+| 4. Quality filter (QUAL>=30)          | 3,757,500          |
 
+
+| Filter       | N of variants  | Filtered variants |
+|:-------------|:--------------:|:-----------------:|
+| No filter    |     10,977,787    |   0               |
+| Filter1      |     5,472,753     |   5,505,034       |
+| Filter2      |     4,238,598     |   1,234,155       |
+| Filter3      |     4,237,961     |   637             |
+| Filter4      |     3,757,500     |   480,461         |
+
+Number of SNPs after GLNexus merging (this applies a soft Qual >10 filter): 10977787
+After first filter (low complexity and repeats) : 5472753
+After second filter (non-biallelic sites and INDELs): 4238598
+After third filter (invariant sites): 4237961
+After fourth filter (QUAL>=30): 3757500
 
 
 
