@@ -262,11 +262,10 @@ With this step, I masked 1,047,269,226 bp, which is 43% of the total genome (2,4
 ### 2.3.2. First round of filtering
 
 The first round of filtering was done in a 4-step procedure: 
-
-    - Filter 1: removing variants in repetitive/low complexity regions.
-    - Filter 2: removing non-biallic sites and indels.
-    - Filter 3: removing invariant sites (substitutions from the reference genome, AF=1).
-    - Filter 4: removing variants with a low quality score (QUAL >= 30).
+- Filter 1: removing variants in repetitive/low complexity regions.
+- Filter 2: removing non-biallic sites and indels.
+- Filter 3: removing invariant sites (substitutions from the reference genome, AF=1).
+- Filter 4: removing variants with a low quality score (QUAL >= 30).
 
 To apply these filters, I used the script [variant_filter_1to4](scripts/variant_filter_1to4.sh), which makes use of [bedtools](https://bedtools.readthedocs.io/en/latest/), [gatk](https://gatk.broadinstitute.org/hc/en-us) and [bcftools](https://samtools.github.io/bcftools/bcftools.html). 
 
@@ -299,17 +298,17 @@ Summary of the first round of filtering:
 
 The next two filters are applied on population, so to do that, I divided the VCF (filter4) into eleven population VCFs: 
 
-    - bal (Balkan Lynx)
-    - cau (Caucasian Lynx)
-    - crp (Carpathian Lynx)
-    - lva (Lynx in Latvia)
-    - nor (Lynx in Norway)
-    - pol (Lynx in NE Poland)
-    - tva (Lynx in Tuva region, Russia)
-    - mng (Lynx in Mongolia)
-    - wru (Lynx in Western Russia: Kirov and Ural regions)
-    - yak (Lynx in Yakutia, Russia)
-    - pyk (Lynx in Primorsky Krai, Russia)
+- bal (Balkan Lynx)
+- cau (Caucasian Lynx)
+- crp (Carpathian Lynx)
+- lva (Lynx in Latvia)
+- nor (Lynx in Norway)
+- pol (Lynx in NE Poland)
+- tva (Lynx in Tuva region, Russia)
+- mng (Lynx in Mongolia)
+- wru (Lynx in Western Russia: Kirov and Ural regions)
+- yak (Lynx in Yakutia, Russia)
+- pyk (Lynx in Primorsky Krai, Russia)
 
 To do this split, I used the [split_vcfs](scripts/commands_and_small-scripts/split_vcfs.sh) script.
 
