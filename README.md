@@ -128,7 +128,7 @@ For the pseudoautosomal regions, I followed [Lucia](https://github.com/luciamayo
 
 To do this, I created a bed file ("mLynLyn1.2.PAR1_sexChr.bed"), where I put the length of the PARs (7 Mb) from both ends of the chromosome (0-7000000; 117087176-124087175), using the indexed fasta file to get the chromosome size. These regions will be treated as autosomal in all my male samples when doing the calling. 
 
-I ran DeepVariant for my samples like this: 
+I performed the calling with the script [variant_calling_deepvariant.sh](scripts/variant_calling_deepvariant.sh), which i ran for my samples like this: 
 
 ```
 # list of bams to process
@@ -152,16 +152,148 @@ for bam in $bams; do
 done
 ```
 
+#### Variant calling QC
+
+As per Lucia's method (paranoia), I also did a QC of the VC to check if everything went well. I did the same as her:
+
+```
+module load samtools
+
+for i in /mnt/lustre/hsm/nlsas/notape/home/csic/ebd/jgl/lynx_genome/lynx_data/mLynLyn1.2_ref_gvcfs/*_mLynLyn1.2_ref.vcf.gz; do
+  bcftools stats ${i} > /mnt/lustre/hsm/nlsas/notape/home/csic/ebd/jgl/lynx_genome/lynx_data/mLynLyn1.2_ref_gvcfs/bcftools_stats/$(basename "${i}" .vcf.gz)_stats.txt
+done
+
+module load multiqc 
+multiqc *_stats.txt
+```
+
+
+## 2.2. gVCF merging
+
+The merging of the genome VCFs (gVCF) into a single combined VCF file was done with [GLnexus v1.4.1](https://github.com/dnanexus-rnd/GLnexus). This first creates a BCF file (a binary version), which then needs to be converted to a VCF. I ran GLnexus with the "DeepVariantWGS" configuration, which already applies some soft quality filters (AQ > 10). 
+
+To do so, first I created a list of all the gVCFs that will be merged:
+
+```
+ls /mnt/lustre/hsm/nlsas/notape/home/csic/ebd/jgl/lynx_genome/lynx_data/mLynLyn1.2_ref_gvcfs/*g.vcf.gz > /mnt/lustre/hsm/nlsas/notape/home/csic/ebd/jgl/lynx_genome/lynx_data/mLynLyn1.2_ref_gvcfs/gvcfs_list.txt
+```
+
+Then, I ran the script [glnexus_script.sh](scripts/glnexus_script.sh): 
+
+```
+sbatch -c 32 --mem=100G -t 03:00:00 /mnt/lustre/hsm/nlsas/notape/home/csic/ebd/jgl/agonev/scripts/glnexus_script.sh /mnt/lustre/hsm/nlsas/notape/home/csic/ebd/jgl/lynx_genome/lynx_data/mLynLyn1.2_ref_gvcfs/gvcfs_list.txt /mnt/lustre/hsm/nlsas/notape/home/csic/ebd/jgl/lynx_genome/lynx_data/mLynLyn1.2_ref_vcfs/c_ll_105_mLynLyn1.2_ref.vcf.gz 
+``` 
+
+#### VCF QC
+
+I didn't do this, put it only for future reference as [Lucia did it](https://github.com/luciamayorf/Variant_calling_and_filtering/blob/main/README.md#vcf-qc) with her merged vcf.
+
+
+```
+module load samtools
+module load multiqc
+
+bcftools index -t filename.vcf.gz
+bcftools stats filename.vcf.gz > filename_ref_stats.txt
+
+multiqc filename_ref_stats.txt
+```
+
+
+
+### Removing half-calls
+
+*This is something that I discovered later on in the process, but it is good to address it now, to avoid any unnecessary headaches in the downstream analyses.* 
+
+GLnexus merging can sometimes result in "half-called" loci. These are all the genotypes that appear as ./0 and ./1 (refer to this [blog post](https://github.com/dnanexus-rnd/GLnexus/wiki/Reading-GLnexus-pVCFs) for a more detailed explanation). Perhaps there is an option in GLnexus, but I got rid of these half-calls like this: 
+
+```
+
+bcftools +setGT input.vcf -- -t ./x -n . > output_temp.vcf     # Recode all half-calls into missing genotypes ./.
+bcftools +fill-tags output_temp.vcf -Ov -o output.vcf -- -t AC,AF,AN    # Recalculate the AC, AF and AN fields of the VCF INFO
+rm output_temp.vcf
+
+```
+
+
+## 2.3. Variant filtering
+
+### 2.3.1. Identify repetitive and low complexity regions
+
+The [CNAG](https://www.cnag.eu/) team had previously identified all repetitive regions as part of the reference genome assembly, using [RepeatModeler](https://www.repeatmasker.org/RepeatModeler/). These regions are found in the reference genome directory, in the file **Repeats.4jb.gff3**. 
+
+As it was done for the Iberian lynx (and for Enrico's [Lynxtrogression](https://github.com/Enricobazzi/Lynxtrogression_v2/blob/main/variant_filtering.md#find-repetitive-and-low-complexity-regions) project), I masked the genome both with the intersperse repeats in the Repeats.4jb.gff3 and with the low complexity regions, which I calculated using [RepeatMasker](https://www.repeatmasker.org/RepeatMasker/). To do this, I sbatched the script [repeatmasker_lowcomplex.sh](scripts/repeatmasker_lowcomplex.sh):
+
+```
+sbatch /mnt/lustre/hsm/nlsas/notape/home/csic/ebd/jgl/agonev/scripts/repeatmasker_lowcomplex.sh
+```
+
+To combine the repeats with the low complexity regions, I did: 
+
+```
+ref_dir=/mnt/lustre/hsm/nlsas/notape/home/csic/ebd/jgl/reference_genomes/lynx_lynx_mLynLyn1.2
+
+cat <(grep -v "#" ${ref_dir}/Repeats.4jb.gff3 | awk -F'\t' '{OFS="\t"; print $1, $4-1, $5}') \
+    <(grep -v "#" ${ref_dir}/repetitive_regions/low_complex/mLynLyn1.2.revcomp.scaffolds.fa.out.gff | awk -F'\t' '{OFS="\t"; print $1, $4-1, $5}') |
+    sort -k1,1 -k2,2n -k3,3n |
+    bedtools merge -i - \
+    > ${ref_dir}/repeats_lowcomplexity_regions.bed
+
+```
+
+The resulting bed file **repeats_lowcomplexity_regions.bed** will be used for filtering.
+
+Finally, to see what portion of the genome I have masked, I checked the 
+
+```
+# To get the total length of the genome: 
+awk '{sum+=$2} END {print sum}' ${ref_dir}/mLynLyn1.2.revcomp.scaffolds.fa.fai # 2432111198
+
+# To calculate the length of these regions I run: 
+awk '{sum+=$3-$2} END {print sum}' ${ref_dir}/repeats_lowcomplexity_regions.bed # 1047269226 
+
+# To get the percentage of the genome that is masked:
+echo "scale=2; 1047269226 / 2432111198 * 100" | bc  # 43.06%
+
+```
+
+With this step, I masked 1,047,269,226 bp, which is 43% of the total genome (2,432,111,198).
+
+### 2.3.2. First round of filtering
+
+The first round of filtering was done in a 4-step procedure: 
+
+     - Filter 1: removing variants in repetitive/low complexity regions.
+     - Filter 2: removing non-biallic sites and indels.
+     - Filter 3: removing invariant sites (substitutions from the reference genome, AF=1).
+     - Filter 4: removing variants with a low quality score (QUAL >= 30).
+
+To apply these filters, I used the script [variant_filter_1to4](scripts/variant_filter_1to4.sh), which makes use of [bedtools](https://bedtools.readthedocs.io/en/latest/), [gatk](https://gatk.broadinstitute.org/hc/en-us) and [bcftools](https://samtools.github.io/bcftools/bcftools.html). 
+
+To run this script, I did: 
+
+```
+vcf_dir=/mnt/lustre/hsm/nlsas/notape/home/csic/ebd/jgl/lynx_genome/lynx_data/mLynLyn1.2_ref_vcfs
+invcf=${vcf_dir}/c_ll_105_mLynLyn1.2_ref.vcf.gz
+ref_dir=/mnt/lustre/hsm/nlsas/notape/home/csic/ebd/jgl/reference_genomes/lynx_lynx_mLynLyn1.2
+ref=${ref_dir}/mLynLyn1.2.revcomp.scaffolds.fa
+mask=${ref_dir}/repeats_lowcomplexity_regions.bed
+
+sbatch --mem=12GB -t 03:00:00 scripts/variant_filter_1to4.sh ${ref} ${invcf} ${mask}
+```
+
 
 
 
 
 [table]
-Number of SNPs after GLNexus merging: 10977787 (this applies a soft Qual >10 filter)
-After first filter (low complexity and repeats) : 5472753
-After second filter (non-biallelic sites and INDELs): 4238598
-After third filter (invariant sites): 4237961
-After fourth filter (QUAL>=30): 3757500
+| Filter                           | Number of Variants |
+|----------------------------------|-------------------|
+| GLNexus merging (Qual >10)       | 10,977,787        |
+| Low complexity and repeats       | 5,472,753         |
+| Non-biallelic sites and INDELs   | 4,238,598         |
+| Invariant sites                  | 4,237,961         |
+| QUAL >= 30                       | 3,757,500         |
 
 
 
