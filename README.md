@@ -312,7 +312,7 @@ The next two filters are applied on population, so to do that, I divided the VCF
 
 To do this split, I used the [split_vcfs](scripts/commands_and_small-scripts/split_vcfs.sh) script.
 
-## Depth filtering 
+### Depth filtering 
 
 To avoid including possible paralogs in the analysis, one can eliminate genomic regions where an excess of sequencing reads align to the reference genome. Same as [Enrico](https://github.com/Enricobazzi/Lynxtrogression_v2/blob/main/variant_filtering.md#calculate-read-depth-filters-in-10k-bp-window), I decided to use 10kbp windows, where the mean read depth was calculated for each sample's BAM file using [mosdepth v0.3.2](https://github.com/brentp/mosdepth). 
 
@@ -351,7 +351,21 @@ yak fail: 626
 all fail: 442
 bal fail and others pass: 0
 ```
+![Balkan](data/variant_filtering/depth/bal_depth_distribution.png)
+![Caucasian](data/variant_filtering/depth/cau_depth_distribution.png)
+![Carpathian](data/variant_filtering/depth/crp_depth_distribution.png)
+![Mongolia](data/variant_filtering/depth/mng_depth_distribution.png)
+![WesternRussia](data/variant_filtering/depth/wru_depth_distribution.png)
+![Latvia](data/variant_filtering/depth/lva_depth_distribution.png)
+![Norway](data/variant_filtering/depth/nor_depth_distribution.png)
+![Poland](data/variant_filtering/depth/pol_depth_distribution.png)
+![Tuva](data/variant_filtering/depth/tva_depth_distribution.png)
+![PrimorskiKray](data/variant_filtering/depth/pyk_depth_distribution.png)
+![Yakutia](data/variant_filtering/depth/yak_depth_distribution.png)
 
 
-## Missingness filtering
+
+
+
+### Missingness filtering
 
