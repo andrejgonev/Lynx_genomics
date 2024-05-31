@@ -14,6 +14,7 @@ sample=$(basename "$bam" | cut -d'_' -f1,2,3,4)
 
 qualimap bamqc \
   -bam ${bam} \
+  --skip-duplicated \
   --java-mem-size=19G \
   -outfile ${sample}_qualimap.html \
   -outformat html \

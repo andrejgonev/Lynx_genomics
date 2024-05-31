@@ -8,7 +8,7 @@
 # Usage of the script: 
 # for input_bam in $(ls /path/to/bams/*_.bam); do 
 # job_id=$(sbatch -c 5 --mem=10GB -t 00:30:00 ./downsampling_samtools.sh ${input_bam} <ds_table.txt> | awk '{print $4}')
-#   echo "${job_id} ${input_bam}" >> /mnt/lustre/scratch/nlsas/home/csic/eye/lmf/logs/downsampling/job_ids_downsampling_samtools.txt
+#   echo "${job_id} ${input_bam}" >> /mnt/lustre/hsm/nlsas/notape/home/csic/ebd/jgl/agonev/logs/downsampling/job_ids_downsampling_samtools.txt
 # done 
 
 # Load the samtools module:
@@ -30,7 +30,7 @@ ds_list=${2}
 sample=$(echo "${bam_basename}" | cut -f1,2,3,4 -d'_')
 
 # Define the downsampling factors:
-target_6=$(grep -w "${sample}" ${ds_list} | cut -f3)
+target_6=$(grep "${sample}" ${ds_list} | cut -f3)
 #target_8=$(grep -w "${sample}" ${ds_list} | cut -f4)
 #target_10=$(grep -w "${sample}" ${ds_list} | cut -f5)
 
@@ -41,3 +41,4 @@ echo "Subsampling ${bam_basename} to 6x"
 samtools view -@ 20 -bh -s ${target_6} ${input_bam} > ${bam_dir}/downsampling/${bam_basename}.6x.bam
 samtools index ${bam_dir}/downsampling/${bam_basename}.6x.bam
 
+# for the future, it would be better to use a seed, so it can be reproducible. Now I forgot. The option to provide a seed is either -s INT.FRAC or --subsample-seed INT --subsample 0.FRAC. 
