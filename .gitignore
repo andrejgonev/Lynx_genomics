@@ -1,5 +1,5 @@
 config/test
 other/
 data/vcfs/
-data/variant_filtering/
+data/variant_filtering/depth/*.bed
 data/.R*

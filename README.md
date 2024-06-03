@@ -369,3 +369,14 @@ bal fail and others pass: 0
 
 ### Missingness filtering
 
+After many different methods tested, I decided to approach the missingness by filtering out the excessively missing variants in each population. This filter, like the read depth filtering, will be calculated on each population separately (this time on their VCFs) by using [bcftools filter](https://samtools.github.io/bcftools/howtos/filtering.html).
+
+For this, I sbatch the script [missingness_bed_table](scripts/missingness_bed_table.sh), which generates a separate BED file for each of the defined threshold values for maximum missingness allowed (from 10 to 30 percent in 5% increments). This BED file contains the SNPs that would be excluded.
+
+Besides, it also generates a [table](data/variant_filtering/missingness/miss_table.txt) which is useful for plotting and visualising the missingness. I plotted using the [miss_plot](data/variant_filtering/missingness/plot_miss.R) R script.
+
+![Missingness_plot](data/variant_filtering/missingness/missing_plot.png). 
+
+Finally, after visually inspecting the missingness, I'd like to apply the filter that would retain 95% of the SNPs in the original VCF (25% if I use all populations, tbd).
+
+*This step is not necessary, but it's useful if one decides to change the missingness threshold at any point and explore more options (also visualize the data). If you know the missingness % you want to filter out, then it is possible to just use the `bcftools filter` command and pipe it in a new vcf.* 
