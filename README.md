@@ -351,17 +351,7 @@ yak fail: 626
 all fail: 442
 bal fail and others pass: 0
 ```
-![Balkan](data/variant_filtering/depth/bal_depth_distribution.png)
-![Caucasian](data/variant_filtering/depth/cau_depth_distribution.png)
-![Carpathian](data/variant_filtering/depth/crp_depth_distribution.png)
-![Mongolia](data/variant_filtering/depth/mng_depth_distribution.png)
-![WesternRussia](data/variant_filtering/depth/wru_depth_distribution.png)
-![Latvia](data/variant_filtering/depth/lva_depth_distribution.png)
-![Norway](data/variant_filtering/depth/nor_depth_distribution.png)
-![Poland](data/variant_filtering/depth/pol_depth_distribution.png)
-![Tuva](data/variant_filtering/depth/tva_depth_distribution.png)
-![PrimorskiKray](data/variant_filtering/depth/pyk_depth_distribution.png)
-![Yakutia](data/variant_filtering/depth/yak_depth_distribution.png)
+![Balkan](data/variant_filtering/depth/bal_depth_distribution.png) ![Caucasian](data/variant_filtering/depth/cau_depth_distribution.png) ![Carpathian](data/variant_filtering/depth/crp_depth_distribution.png) ![Mongolia](data/variant_filtering/depth/mng_depth_distribution.png) ![WesternRussia](data/variant_filtering/depth/wru_depth_distribution.png) ![Latvia](data/variant_filtering/depth/lva_depth_distribution.png) ![Norway](data/variant_filtering/depth/nor_depth_distribution.png) ![Poland](data/variant_filtering/depth/pol_depth_distribution.png) ![Tuva](data/variant_filtering/depth/tva_depth_distribution.png) ![PrimorskiKray](data/variant_filtering/depth/pyk_depth_distribution.png) ![Yakutia](data/variant_filtering/depth/yak_depth_distribution.png)
 
 
 
