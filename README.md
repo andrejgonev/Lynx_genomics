@@ -359,9 +359,9 @@ bal fail and others pass: 0
         <td><img src="data/variant_filtering/depth/crp_depth_distribution.png" alt="Carpathian" style="width: 90%;" /></td>
         <td><img src="data/variant_filtering/depth/mng_depth_distribution.png" alt="Mongolia" style="width: 90%;" /></td>
         <td><img src="data/variant_filtering/depth/wru_depth_distribution.png" alt="Western Russia" style="width: 90%;" /></td>
+        <td><img src="data/variant_filtering/depth/lva_depth_distribution.png" alt="Latvia" style="width: 90%;" /></td>
     </tr>
     <tr>
-        <td><img src="data/variant_filtering/depth/lva_depth_distribution.png" alt="Latvia" style="width: 90%;" /></td>
         <td><img src="data/variant_filtering/depth/nor_depth_distribution.png" alt="Norway" style="width: 90%;" /></td>
         <td><img src="data/variant_filtering/depth/pol_depth_distribution.png" alt="Poland" style="width: 90%;" /></td> 
         <td><img src="data/variant_filtering/depth/tva_depth_distribution.png" alt="Tuva" style="width: 90%;" /></td>
