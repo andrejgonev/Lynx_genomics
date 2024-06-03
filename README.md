@@ -351,38 +351,20 @@ yak fail: 626
 all fail: 442
 bal fail and others pass: 0
 ```
-![Balkan](data/variant_filtering/depth/bal_depth_distribution.png)
-![Caucasian](data/variant_filtering/depth/cau_depth_distribution.png)
-![Carpathian](data/variant_filtering/depth/crp_depth_distribution.png)
-![Mongolia](data/variant_filtering/depth/mng_depth_distribution.png)
-![WesternRussia](data/variant_filtering/depth/wru_depth_distribution.png)
-![Latvia](data/variant_filtering/depth/lva_depth_distribution.png)
-![Norway](data/variant_filtering/depth/nor_depth_distribution.png)
-![Poland](data/variant_filtering/depth/pol_depth_distribution.png)
-![Tuva](data/variant_filtering/depth/tva_depth_distribution.png)
-![PrimorskiKray](data/variant_filtering/depth/pyk_depth_distribution.png)
-![Yakutia](data/variant_filtering/depth/yak_depth_distribution.png)
-
-
-| Balkan | Caucasian | Carpathian | Mongolia | Western Russia |
-|:------:|:---------:|:----------:|:--------:|:-------------:|
-| ![Balkan](data/variant_filtering/depth/bal_depth_distribution.png) | ![Caucasian](data/variant_filtering/depth/cau_depth_distribution.png) | ![Carpathian](data/variant_filtering/depth/crp_depth_distribution.png) | ![Mongolia](data/variant_filtering/depth/mng_depth_distribution.png) | ![Western Russia](data/variant_filtering/depth/wru_depth_distribution.png) |
-
-| Latvia | Norway | Poland | Tuva | Primorski Krai |
-|:------:|:------:|:------:|:----:|:--------------:|
-| ![Latvia](data/variant_filtering/depth/lva_depth_distribution.png) | ![Norway](data/variant_filtering/depth/nor_depth_distribution.png) | ![Poland](data/variant_filtering/depth/pol_depth_distribution.png) | ![Tuva](data/variant_filtering/depth/tva_depth_distribution.png) | ![Primorski Krai](data/variant_filtering/depth/pyk_depth_distribution.png) |
-
-| Yakutia |
-|:-------:|
-| ![Yakutia](data/variant_filtering/depth/yak_depth_distribution.png) |
-
 
 <table>
     <tr>
-        <td><img src="data/variant_filtering/depth/bal_depth_distribution.png" alt="balkan" style="width: 90%;" /></td>
-        <td><img src="data/variant_filtering/depth/cau_depth_distribution.png" alt="caucasian" style="width: 90%;" /></td>
-        <td><img src="data/variant_filtering/depth/crp_depth_distribution.png" alt="carpathian" style="width: 90%;" /></td>
-        <td><img src="data/variant_filtering/depth/mng_depth_distribution.png" alt="mongolia" style="width: 90%;" /></td>
+        <td><img src="data/variant_filtering/depth/bal_depth_distribution.png" alt="Balkan" style="width: 90%;" /></td>
+        <td><img src="data/variant_filtering/depth/cau_depth_distribution.png" alt="Caucasian" style="width: 90%;" /></td>
+        <td><img src="data/variant_filtering/depth/crp_depth_distribution.png" alt="Carpathian" style="width: 90%;" /></td>
+        <td><img src="data/variant_filtering/depth/mng_depth_distribution.png" alt="Mongolia" style="width: 90%;" /></td>
+        <td><img src="data/variant_filtering/depth/wru_depth_distribution.png" alt="Western Russia" style="width: 90%;" /></td>
+        <td><img src="data/variant_filtering/depth/lva_depth_distribution.png" alt="Latvia" style="width: 90%;" /></td>
+        <td><img src="data/variant_filtering/depth/nor_depth_distribution.png" alt="Norway" style="width: 90%;" /></td>
+        <td><img src="data/variant_filtering/depth/pol_depth_distribution.png" alt="Poland" style="width: 90%;" /></td> 
+        <td><img src="data/variant_filtering/depth/tva_depth_distribution.png" alt="Tuva" style="width: 90%;" /></td>
+        <td><img src="data/variant_filtering/depth/pyk_depth_distribution.png" alt="Primorski Krai" style="width: 90%;" /></td>
+        <td><img src="data/variant_filtering/depth/yak_depth_distribution.png" alt="Yakutia" style="width: 90%;" /></td>       
     </tr>
 </table>
 
