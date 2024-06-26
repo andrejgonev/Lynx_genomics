@@ -1,11 +1,9 @@
 #!/bin/bash
-#SBATCH -o logs/fastp/fastp-%j.out
-#SBATCH -e logs/fastp/fastp-%j.err
 #SBATCH --time=3:00:00
 #SBATCH --mem=16G
 #SBATCH --cpus-per-task=6
 
-module load cesga/2020 gcccore/system fastp/0.22.0
+module load fastqc
 
 # This script takes three positional arguments:
 # 1. the directory where the fastq files are located
@@ -35,19 +33,8 @@ else
 fi
 
 # create the fastp directory if it does not exist and give group persmissions
-mkdir -p ${fastq_dir}/fastp
-chmod g+w ${fastq_dir}/fastp/
+mkdir -p ${fastq_dir}/FastQC
+chmod g+w ${fastq_dir}/FastQC
 
-# run fastp
-fastp \
-    -i ${fastq_dir}/${r1_fastq} -I ${fastq_dir}/${r2_fastq} \
-    -o ${fastq_dir}/fastp/${r1_fastp} -O ${fastq_dir}/fastp/${r2_fastp} \
-    -h ${fastq_dir}/fastp/${r1_fastp/.fastq.gz/_fastp.html} -j ${fastq_dir}/fastp/${r1_fastp/.fastq.gz/_fastp.json} \
-    --unpaired1 ${fastq_dir}/fastp/${r1_fastp/.fastq.gz/_unpaired.fastq.gz} --unpaired2 ${fastq_dir}/fastp/${r2_fastp/.fastq.gz/_unpaired.fastq.gz} \
-    --failed_out ${fastq_dir}/fastp/${r1_fastp/.fastq.gz/_failed.fastq.gz} \
-    --dont_overwrite \
-    --trim_poly_g \
-    --length_required 30 \
-    --correction \
-    --detect_adapter_for_pe \
-    --thread 6
+fastqc ${fastq_dir}/${r1_fastp} -o ${fastq_dir}/FastQC
+fastqc ${fastq_dir}/${r2_fastp} -o ${fastq_dir}/FastQC
