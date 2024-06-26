@@ -45,7 +45,7 @@ if [[ ${sex} == "male" ]]; then
                     --reads=${bam} \
                     --output_gvcf=${output_dir}/${sample_name}mLynLyn1.2_ref.g.vcf.gz \
                     --output_vcf=${output_dir}/${sample_name}_mLynLyn1.2_ref.vcf.gz \
-                    --par_regions_bed="/mnt/lustre/hsm/nlsas/notape/home/csic/ebd/jgl/reference_genomes/lynx_lynx_mLynLyn1.2/mLynLyn1.2.PAR1_sexChr.bed" \
+                    --par_regions_bed="/mnt/netapp2/Store_csebdjgl/reference_genomes/lynx_lynx_mLynLyn1.2/mLynLyn1.2.PAR1_sexChr.bed" \
                     --haploid_contigs="mLynLyn1.2_ChrX,mLynLyn1.2_ChrY,mLynLyn1.2_ChrY_unloc_*" \
                     --num_shards=32
 else
