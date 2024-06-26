@@ -20,6 +20,20 @@ for row in $(cat data/barcodes/barcodes_filtered | tr ' ' ':'); do
 
 done
 ```
+I did the same with the new Balkan samples:
+
+```
+for row in $(cat data/barcodes/barcodes_blx2 | tr ' ' ':'); do
+    
+    fastq_dir=$(echo $row | cut -d':' -f2)
+    r1_fastq=$(echo $row | cut -d':' -f3)
+    r2_fastq=$(echo $row | cut -d':' -f4)
+    fastqid=$(echo $r1_fastq | sed 's/_1.fq.gz$//')
+    echo "sbatch scripts/sbatch_fastp_fqdir_r1fq_r2fq.sh ${fastq_dir} ${r1_fastq} ${r2_fastq}"
+    sbatch -o logs/fastp/${fastqid}.out -e logs/fastp/${fastqid}.err scripts/sbatch_fastp_fqdir_r1fq_r2fq.sh ${fastq_dir} ${r1_fastq} ${r2_fastq}
+
+done
+```
 
 For each line of the barcodes file, this small script will submit a job to the cluster using the Enrico's [sbatch_fastp_fqdir_r1fq_r2fq.sh](scripts/sbatch_fastp_fqdir_r1fq_r2fq.sh) script. Fastp was ran with the following flags:
 
@@ -86,7 +100,7 @@ The script makes use of [bwa v](), [samtools v](), [picard v]() and [gatk v]() a
 
  ```
  # bam folder
-bam_folder=/mnt/lustre/hsm/nlsas/notape/home/csic/ebd/jgl/lynx_genome/lynx_data/mLynLyn1.2_ref_bams
+bam_folder=/mnt/netapp2/Store_csebdjgl/lynx_genome/lynx_data/mLynLyn1.2_ref_bams
 
 # sbatch QualiMap of all samples
 bams=$(ls ${bam_folder}/*er.bam)
@@ -132,23 +146,23 @@ I performed the calling with the script [variant_calling_deepvariant.sh](scripts
 
 ```
 # list of bams to process
-bams=$(ls /mnt/lustre/hsm/nlsas/notape/home/csic/ebd/jgl/lynx_genome/lynx_data/mLynLyn1.2_ref_bams/*er.bam | grep -vE "ca_0249|ca_0253")
+bams=$(ls /mnt/netapp2/Store_csebdjgl/lynx_genome/lynx_data/mLynLyn1.2_ref_bams/*er.bam | grep -vE "ca_0249|ca_0253")
 
 # reference genome directory
-ref_genome=/mnt/lustre/hsm/nlsas/notape/home/csic/ebd/jgl/reference_genomes/lynx_lynx_mLynLyn1.2/mLynLyn1.2.revcomp.scaffolds.fa
+ref_genome=/mnt/netapp2/Store_csebdjgl/reference_genomes/lynx_lynx_mLynLyn1.2/mLynLyn1.2.revcomp.scaffolds.fa
 
 # sample list directory
-sample_list=/mnt/lustre/hsm/nlsas/notape/home/csic/ebd/jgl/agonev/barcodes/samples_sex.txt
+sample_list=/mnt/netapp2/Store_csebdjgl/agonev/barcodes/samples_sex.txt
 
 # output directory
-output_dir=/mnt/lustre/hsm/nlsas/notape/home/csic/ebd/jgl/lynx_genome/lynx_data/mLynLyn1.2_ref_gvcfs/
+output_dir=/mnt/netapp2/Store_csebdjgl/lynx_genome/lynx_data/mLynLyn1.2_ref_gvcfs/
 
 # loop through bams and submit jobs
 for bam in $bams; do
     sample_name=$(basename ${bam} _mLynLyn_ref.sorted.rg.merged_sorted.rmdup.indelrealigner.bam)
     echo "sample_name: ${sample_name}"
-    sbatch -o /mnt/lustre/hsm/nlsas/notape/home/csic/ebd/jgl/agonev/logs/variant_calling/deepvariant/${sample_name}.out -e /mnt/lustre/hsm/nlsas/notape/home/csic/ebd/jgl/agonev/logs/variant_calling/deepvariant/${sample_name}.err \
-    -c 32 --mem=64GB -t 06:00:00 --gres=gpu:a100:1 /mnt/lustre/hsm/nlsas/notape/home/csic/ebd/jgl/agonev/scripts/variant_calling_deepvariant.sh ${bam} ${ref_genome} ${sample_list} ${output_dir} ${sample_name}
+    sbatch -o /mnt/netapp2/Store_csebdjgl/agonev/logs/variant_calling/deepvariant/${sample_name}.out -e /mnt/netapp2/Store_csebdjgl/agonev/logs/variant_calling/deepvariant/${sample_name}.err \
+    -c 32 --mem=64GB -t 06:00:00 --gres=gpu:a100:1 /mnt/netapp2/Store_csebdjgl/agonev/scripts/variant_calling_deepvariant.sh ${bam} ${ref_genome} ${sample_list} ${output_dir} ${sample_name}
 done
 ```
 
@@ -159,8 +173,8 @@ As per Lucia's method (paranoia), I also did a QC of the VC to check if everythi
 ```
 module load samtools
 
-for i in /mnt/lustre/hsm/nlsas/notape/home/csic/ebd/jgl/lynx_genome/lynx_data/mLynLyn1.2_ref_gvcfs/*_mLynLyn1.2_ref.vcf.gz; do
-  bcftools stats ${i} > /mnt/lustre/hsm/nlsas/notape/home/csic/ebd/jgl/lynx_genome/lynx_data/mLynLyn1.2_ref_gvcfs/bcftools_stats/$(basename "${i}" .vcf.gz)_stats.txt
+for i in /mnt/netapp2/Store_csebdjgl/lynx_genome/lynx_data/mLynLyn1.2_ref_gvcfs/*_mLynLyn1.2_ref.vcf.gz; do
+  bcftools stats ${i} > /mnt/netapp2/Store_csebdjgl/lynx_genome/lynx_data/mLynLyn1.2_ref_gvcfs/bcftools_stats/$(basename "${i}" .vcf.gz)_stats.txt
 done
 
 module load multiqc 
@@ -175,13 +189,13 @@ The merging of the genome VCFs (gVCF) into a single combined VCF file was done w
 To do so, first I created a list of all the gVCFs that will be merged:
 
 ```
-ls /mnt/lustre/hsm/nlsas/notape/home/csic/ebd/jgl/lynx_genome/lynx_data/mLynLyn1.2_ref_gvcfs/*g.vcf.gz > /mnt/lustre/hsm/nlsas/notape/home/csic/ebd/jgl/lynx_genome/lynx_data/mLynLyn1.2_ref_gvcfs/gvcfs_list.txt
+ls /mnt/netapp2/Store_csebdjgl/lynx_genome/lynx_data/mLynLyn1.2_ref_gvcfs/*g.vcf.gz > /mnt/netapp2/Store_csebdjgl/lynx_genome/lynx_data/mLynLyn1.2_ref_gvcfs/gvcfs_list.txt
 ```
 
 Then, I ran the script [glnexus_script.sh](scripts/glnexus_script.sh): 
 
 ```
-sbatch -c 32 --mem=100G -t 03:00:00 /mnt/lustre/hsm/nlsas/notape/home/csic/ebd/jgl/agonev/scripts/glnexus_script.sh /mnt/lustre/hsm/nlsas/notape/home/csic/ebd/jgl/lynx_genome/lynx_data/mLynLyn1.2_ref_gvcfs/gvcfs_list.txt /mnt/lustre/hsm/nlsas/notape/home/csic/ebd/jgl/lynx_genome/lynx_data/mLynLyn1.2_ref_vcfs/c_ll_105_mLynLyn1.2_ref.vcf.gz 
+sbatch -c 32 --mem=100G -t 03:00:00 /mnt/netapp2/Store_csebdjgl/agonev/scripts/glnexus_script.sh /mnt/netapp2/Store_csebdjgl/lynx_genome/lynx_data/mLynLyn1.2_ref_gvcfs/gvcfs_list.txt /mnt/netapp2/Store_csebdjgl/lynx_genome/lynx_data/mLynLyn1.2_ref_vcfs/c_ll_105_mLynLyn1.2_ref.vcf.gz 
 ``` 
 
 #### VCF QC
@@ -225,13 +239,13 @@ The [CNAG](https://www.cnag.eu/) team had previously identified all repetitive r
 As it was done for the Iberian lynx (and for Enrico's [Lynxtrogression](https://github.com/Enricobazzi/Lynxtrogression_v2/blob/main/variant_filtering.md#find-repetitive-and-low-complexity-regions) project), I masked the genome both with the intersperse repeats in the Repeats.4jb.gff3 and with the low complexity regions, which I calculated using [RepeatMasker](https://www.repeatmasker.org/RepeatMasker/). To do this, I sbatched the script [repeatmasker_lowcomplex.sh](scripts/repeatmasker_lowcomplex.sh):
 
 ```
-sbatch /mnt/lustre/hsm/nlsas/notape/home/csic/ebd/jgl/agonev/scripts/repeatmasker_lowcomplex.sh
+sbatch /mnt/netapp2/Store_csebdjgl/agonev/scripts/repeatmasker_lowcomplex.sh
 ```
 
 To combine the repeats with the low complexity regions, I did: 
 
 ```
-ref_dir=/mnt/lustre/hsm/nlsas/notape/home/csic/ebd/jgl/reference_genomes/lynx_lynx_mLynLyn1.2
+ref_dir=/mnt/netapp2/Store_csebdjgl/reference_genomes/lynx_lynx_mLynLyn1.2
 
 cat <(grep -v "#" ${ref_dir}/Repeats.4jb.gff3 | awk -F'\t' '{OFS="\t"; print $1, $4-1, $5}') \
     <(grep -v "#" ${ref_dir}/repetitive_regions/low_complex/mLynLyn1.2.revcomp.scaffolds.fa.out.gff | awk -F'\t' '{OFS="\t"; print $1, $4-1, $5}') |
@@ -272,9 +286,9 @@ To apply these filters, I used the script [variant_filter_1to4](scripts/variant_
 To run this script, I did: 
 
 ```
-vcf_dir=/mnt/lustre/hsm/nlsas/notape/home/csic/ebd/jgl/lynx_genome/lynx_data/mLynLyn1.2_ref_vcfs
+vcf_dir=/mnt/netapp2/Store_csebdjgl/lynx_genome/lynx_data/mLynLyn1.2_ref_vcfs
 invcf=${vcf_dir}/c_ll_105_mLynLyn1.2_ref.vcf.gz
-ref_dir=/mnt/lustre/hsm/nlsas/notape/home/csic/ebd/jgl/reference_genomes/lynx_lynx_mLynLyn1.2
+ref_dir=/mnt/netapp2/Store_csebdjgl/reference_genomes/lynx_lynx_mLynLyn1.2
 ref=${ref_dir}/mLynLyn1.2.revcomp.scaffolds.fa
 mask=${ref_dir}/repeats_lowcomplexity_regions.bed
 
@@ -376,12 +390,39 @@ bal fail and others pass: 0
 
 After many different methods tested, I decided to approach the missingness by filtering out the excessively missing variants in each population. This filter, like the read depth filtering, will be calculated on each population separately (this time on their VCFs) by using [bcftools filter](https://samtools.github.io/bcftools/howtos/filtering.html).
 
-For this, I sbatch the script [missingness_bed_table](scripts/missingness_bed_table.sh), which generates a separate BED file for each of the defined threshold values for maximum missingness allowed (from 10 to 30 percent in 5% increments). This BED file contains the SNPs that would be excluded.
+For this, I sbatch the script [missingness_bed_table](scripts/missingness_bed_table.sh), which generates a BED file for each of the defined threshold values for maximum missingness allowed (from 10 to 30 percent in 5% increments). This BED file contains the SNPs that would be excluded.
 
 Besides, it also generates a [table](data/variant_filtering/missingness/miss_table.txt) which is useful for plotting and visualising the missingness. I plotted using the [miss_plot](data/variant_filtering/missingness/plot_miss.R) R script.
 
 ![Missingness_plot](data/variant_filtering/missingness/missing_plot.png). 
 
-Finally, after visually inspecting the missingness, I'd like to apply the filter that would retain 95% of the SNPs in the original VCF (25% if I use all populations, tbd).
+Finally, after visually inspecting the missingness, I'd like to apply the filter that would retain 95% of the SNPs in the original VCF (in this case it would be 25% if I use all 11 populations).
 
 *This step is not necessary, but it's useful if one decides to change the missingness threshold at any point and explore more options (also visualize the data). If you know the missingness % you want to filter out, then it is possible to just use the `bcftools filter` command and pipe it in a new vcf.* 
+
+### Applying filters
+
+To apply the read depth and missingness filters, I can subtract the positions contained in the BED files from the VCF containing the populations I want to use, using `bedtools subtract`.
+
+If I wish to use all 11 populations, I will apply all population bed files (both for RD and miss) to the filter4 VCF from the first round of filtering. But should I choose to use a subset of populations (ex. Balkan-Carpathian-Caucasian, or another group), then I need to first split the filter4 VCF into the desired populations (same as before, using the [split_vcfs](scripts/commands_and_small-scripts/split_vcfs.sh) script) and then apply each corresponding filter to the newly created VCF. 
+
+*** maybe show an example when you figure out which ones you use!
+
+*NOTE: Another option would be to merge the population VCFs using any common tool, but just to make sure no mistakes are made, I chose to do it the other way*
+
+*** show the modified apply_rd_miss_filter script here, once you do it!
+
+Finally, I removed all non-variant SNPs from the selected populations' VCF, because some variants might have been present exclusively in the other populations that didn't make the final cut.
+
+*** This is from enrico, change it when you use it!
+
+```
+vcf_dir=/mnt/netapp2/Store_csebdjgl/lynx_genome/lynx_data/mLynRuf2.2_ref_vcfs
+
+for pop in wel eel sel; do
+    echo "removing non-variant SNPs from lpa-${pop} population pair"
+    bcftools view -e "INFO/AF=1.00 | INFO/AF=0.00" \
+        ${vcf_dir}/lynxtrogression_v2.autosomic_scaffolds.filter4.lpa-${pop}_pair.miss_fil.rd_fil.vcf \
+    > ${vcf_dir}/lynxtrogression_v2.autosomic_scaffolds.filter4.lpa-${pop}_pair.miss_fil.rd_fil.variant.vcf
+done
+```
