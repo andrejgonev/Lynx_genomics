@@ -107,5 +107,3 @@ for bam in $bams ; do
 
 done
 
-# Balkan lynx samples
-

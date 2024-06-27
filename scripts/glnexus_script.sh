@@ -1,6 +1,6 @@
 #!/bin/bash
-#SBATCH --output=/mnt/lustre/hsm/nlsas/notape/home/csic/ebd/jgl/agonev/logs/glnexus/slurm-%j.out
-#SBATCH --error=/mnt/lustre/hsm/nlsas/notape/home/csic/ebd/jgl/agonev/logs/glnexus/slurm-%j.err
+#SBATCH --output=/mnt/netapp2/Store_csebdjgl/agonev/logs/glnexus/slurm-%j.out
+#SBATCH --error=/mnt/netapp2/Store_csebdjgl/agonev/logs/glnexus/slurm-%j.err
 
 # In this script, the gVCFs obtained with DeepVariant are merged into a single VCF file using glnexus.
 
@@ -18,7 +18,7 @@ gvcfs_list=${1}
 output=${2}
 
 # Remove the following directory if it exists (it is created when running GLNexus, and it has to be removed before running it again):
-rm -rf /mnt/lustre/hsm/nlsas/notape/home/csic/ebd/jgl/agonev/scripts/GLnexus.DB
+rm -rf /mnt/netapp2/Store_csebdjgl/agonev/scripts/GLnexus.DB
 
 # Run glnexus:
 glnexus_cli --config DeepVariantWGS --list ${gvcfs_list} --mem-gbytes 95 -t 30 | bcftools view - | bgzip -@ 30 -c > ${output}
