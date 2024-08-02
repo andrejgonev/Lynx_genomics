@@ -3,3 +3,4 @@ other/
 data/vcfs/
 data/variant_filtering/depth/*.bed
 data/.R*
+data/make_rdfilter_beds_enrico.py
