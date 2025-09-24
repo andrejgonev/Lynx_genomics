@@ -1,0 +1,13 @@
+sample_name: c_ll_ba_0265
+fastq_id: 'll0265_MKDN240004997-1A_227NWCLT4_L2 ll0265_MKDN240004997-1A_227NWCLT4_L3'
+fastq_r1: 'll0265_MKDN240004997-1A_227NWCLT4_L2_1.fastp.fastq.gz ll0265_MKDN240004997-1A_227NWCLT4_L3_1.fastp.fastq.gz'
+fastq_r2: 'll0265_MKDN240004997-1A_227NWCLT4_L2_2.fastp.fastq.gz ll0265_MKDN240004997-1A_227NWCLT4_L3_2.fastp.fastq.gz'
+in_fastq_folder: /mnt/netapp2/Store_csebdjgl/lynx_genome/lynx_data/FASTQ_files/novogene_blx_NVUK2024021508/fastp
+reference_genome: /mnt/netapp2/Store_csebdjgl/reference_genomes/lynx_lynx_mLynLyn1.2/mLynLyn1.2.revcomp.scaffolds.fa
+out_bam_folder: /mnt/netapp2/Store_csebdjgl/lynx_genome/lynx_data/mLynLyn1.2_ref_bams/blx_new
+threads: 20
+alignment_name: mLynLyn_ref
+bwa: bwa
+samtools: samtools
+picard: 'java -jar /opt/cesga/2020/software/Core/picard/2.25.5/picard.jar'
+gatk: 'java -jar /opt/cesga/2020/software/Core/gatk/3.7-0-gcfedb67/GenomeAnalysisTK.jar'
